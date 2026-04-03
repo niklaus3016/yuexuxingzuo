@@ -39,10 +39,17 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Install Gradle 8.4
+        run: |
+          curl -s "https://get.sdkman.io" | bash
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          sdk install gradle 8.4
+
       - name: Build APK
         run: |
           cd android
-          gradle clean assembleDebug --stacktrace --warning-mode all --gradle-version 8.4
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          gradle clean assembleDebug --stacktrace --warning-mode all
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

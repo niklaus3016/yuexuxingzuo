@@ -49,7 +49,7 @@ jobs:
         run: |
           cd android
           source "$HOME/.sdkman/bin/sdkman-init.sh"
-          gradle clean assembleDebug --stacktrace --warning-mode all
+          gradle clean assembleDebug --stacktrace --warning-mode all --debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

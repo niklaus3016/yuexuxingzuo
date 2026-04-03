@@ -46,7 +46,8 @@ jobs:
       - name: Build APK
         run: |
           cd android
-          gradle assembleDebug --stacktrace
+          gradle clean
+          gradle assembleDebug --info --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

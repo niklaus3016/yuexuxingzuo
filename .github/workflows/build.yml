@@ -42,6 +42,7 @@ jobs:
       - name: Build APK
         run: |
           cd android
+          chmod +x ./gradlew
           ./gradlew clean assembleDebug --stacktrace --warning-mode all
 
       - name: Upload APK

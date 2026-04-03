@@ -39,11 +39,11 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Gradle 8.4
+      - name: Install Gradle 8.13
         run: |
           curl -s "https://get.sdkman.io" | bash
           source "$HOME/.sdkman/bin/sdkman-init.sh"
-          sdk install gradle 8.4
+          sdk install gradle 8.13
 
       - name: Build APK
         run: |

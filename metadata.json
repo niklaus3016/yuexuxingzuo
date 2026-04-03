@@ -1,0 +1,5 @@
+{
+  "name": "月序星座",
+  "description": "轻量化星座查询工具，支持阴阳历转换，全离线运行。",
+  "requestFramePermissions": []
+}

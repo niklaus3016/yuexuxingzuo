@@ -36,20 +36,18 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Gradle 8.13
-        run: |
-          curl -s "https://get.sdkman.io" | bash
-          source "$HOME/.sdkman/bin/sdkman-init.sh"
-          sdk install gradle 8.13
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
 
       - name: Build APK
         run: |
           cd android
-          source "$HOME/.sdkman/bin/sdkman-init.sh"
-          gradle clean assembleDebug --stacktrace --warning-mode all --debug
+          chmod +x ./gradlew
+          ./gradlew clean assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

@@ -43,7 +43,7 @@ jobs:
       - name: Build Android APK
         run: |
           cd android
-          gradle assembleDebug
+          gradle assembleDebug --stacktrace --warning-mode all
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4

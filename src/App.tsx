@@ -115,7 +115,7 @@ const PrivacyPolicyContent = () => (
     <h1 className="text-2xl font-bold text-[#0071E3] text-center mb-2">🔒 隐私政策</h1>
     <p className="text-center text-gray-600 mb-6"><strong>生效日期</strong>：2026年03月15日</p>
 
-    <div className="bg-linear-to-r from-blue-50 to-blue-100 p-6 rounded-lg border-l-4 border-[#0071E3] mb-6">
+    <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg border-l-4 border-[#0071E3] mb-6">
       <p className="text-gray-800">欢迎使用「月序星座」（以下简称"本应用"）。本应用由<strong>光年跃迁（温州）科技有限公司</strong>（以下简称"我们"）开发并运营。我们深知个人信息对您的重要性，将严格遵守《中华人民共和国个人信息保护法》等相关法律法规，保护您的个人信息安全。</p>
     </div>
 
@@ -617,7 +617,7 @@ const DetailPage = ({ constellation, date, type, onBack }: { constellation: Cons
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             onClick={() => setShowImage(true)}
-            className="w-32 h-32 mx-auto rounded-full bg-linear-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-6xl shadow-2xl shadow-indigo-500/20 cursor-pointer hover:scale-105 active:scale-95 transition-transform"
+            className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-6xl shadow-2xl shadow-indigo-500/20 cursor-pointer hover:scale-105 active:scale-95 transition-transform"
           >
             {constellation.icon}
           </motion.div>
@@ -715,7 +715,7 @@ const DetailPage = ({ constellation, date, type, onBack }: { constellation: Cons
                         animate={{ width: `${target.score}%` }}
                         className={cn(
                           "h-full rounded-full",
-                          target.score >= 90 ? "bg-linear-to-r from-pink-500 to-rose-500" : 
+                          target.score >= 90 ? "bg-gradient-to-r from-pink-500 to-rose-500" : 
                           target.score >= 70 ? "bg-indigo-500" : 
                           "bg-white/20"
                         )}

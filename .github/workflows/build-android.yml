@@ -58,6 +58,23 @@ jobs:
         ls -la my-release-key.keystore
         file my-release-key.keystore
 
+    - name: Extract SHA1 from keystore
+      run: |
+        cd android
+        echo "Run # 将 base64 编码的 keystore 还原为文件"
+        echo ""
+        echo "===== SHA1 指纹（小米应用商店用）====="
+        # Extract SHA1 fingerprint with colons
+        sha1_with_colons=$(keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep -A 1 "SHA1:" | tail -1 | sed 's/^[[:space:]]*//')
+        echo "$sha1_with_colons"
+        echo "======================================="
+        echo ""
+        echo "===== 去掉冒号的 SHA1（直接复制）====="
+        # Remove colons from SHA1
+        sha1_without_colons=$(echo "$sha1_with_colons" | tr -d ":")
+        echo "$sha1_without_colons"
+        echo "======================================="
+
     - name: Build Android Release APK
       run: |
         cd android

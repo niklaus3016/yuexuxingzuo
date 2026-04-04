@@ -64,8 +64,8 @@ jobs:
         echo "Run # 将 base64 编码的 keystore 还原为文件"
         echo ""
         echo "===== SHA1 指纹（小米应用商店用）====="
-        # Extract SHA1 fingerprint with colons
-        sha1_with_colons=$(keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep -E "^SHA1:" | sed 's/SHA1:\s*//')
+        # Extract SHA1 fingerprint with colons using more reliable method
+        sha1_with_colons=$(keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep -i sha1 | head -1 | sed 's/.*SHA1:\s*//' | sed 's/\s*$//')
         echo "$sha1_with_colons"
         echo "======================================="
         echo ""
@@ -74,6 +74,9 @@ jobs:
         sha1_without_colons=$(echo "$sha1_with_colons" | tr -d ":")
         echo "$sha1_without_colons"
         echo "======================================="
+        # Debug: show full keytool output
+        echo "\n=== Debug: Full keytool output ==="
+        keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | head -30
 
     - name: Build Android Release APK
       run: |

@@ -842,6 +842,7 @@ export default function App() {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showAgreementModal, setShowAgreementModal] = useState<string | null>(null);
   const [showDeclineModal, setShowDeclineModal] = useState(false);
+  const [hasDeclinedPrivacy, setHasDeclinedPrivacy] = useState(false);
 
   // Check if user has already accepted the privacy policy
   useEffect(() => {
@@ -874,8 +875,8 @@ export default function App() {
   };
 
   const handleDeclineConfirm = () => {
-    // In a real app, you might want to exit the app here
-    // For web, we'll just close the modal and keep the app accessible
+    // Set state to track that user has declined privacy policy
+    setHasDeclinedPrivacy(true);
     setShowDeclineModal(false);
     setShowPrivacyModal(false);
   };
@@ -897,40 +898,64 @@ export default function App() {
       <StarBackground />
       
       <main className="relative z-0">
-        <AnimatePresence mode="wait">
-          {selectedConstellation ? (
-            <motion.div
-              key="detail"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-            >
-              <DetailPage 
-                constellation={selectedConstellation.c} 
-                date={selectedConstellation.date} 
-                type={selectedConstellation.type} 
-                onBack={() => setSelectedConstellation(null)} 
-              />
-            </motion.div>
-          ) : (
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              {activeTab === 'home' && (
-                <HomePage 
-                  onSelect={handleSelect} 
-                  history={history} 
-                  calculateConstellation={calculateConstellation} 
+        {hasDeclinedPrivacy ? (
+          <div className="h-screen flex flex-col items-center justify-center p-6">
+            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 text-center space-y-6">
+              <div className="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center mx-auto">
+                <ShieldCheck className="w-10 h-10 text-red-400" />
+              </div>
+              <h2 className="text-2xl font-bold">无法使用应用</h2>
+              <p className="text-white/70">
+                您已拒绝隐私政策，无法使用月序星座应用。
+                请重新启动应用并同意隐私政策以继续使用。
+              </p>
+              <Button 
+                onClick={() => {
+                  setHasDeclinedPrivacy(false);
+                  setShowPrivacyModal(true);
+                }}
+                className="w-full py-4"
+              >
+                重新同意
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <AnimatePresence mode="wait">
+            {selectedConstellation ? (
+              <motion.div
+                key="detail"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <DetailPage 
+                  constellation={selectedConstellation.c} 
+                  date={selectedConstellation.date} 
+                  type={selectedConstellation.type} 
+                  onBack={() => setSelectedConstellation(null)} 
                 />
-              )}
-              {activeTab === 'list' && <ListPage onSelect={handleListSelect} />}
-              {activeTab === 'settings' && <SettingsPage clearHistory={clearHistory} onOpenPrivacy={handleOpenPrivacy} />}
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                {activeTab === 'home' && (
+                  <HomePage 
+                    onSelect={handleSelect} 
+                    history={history} 
+                    calculateConstellation={calculateConstellation} 
+                  />
+                )}
+                {activeTab === 'list' && <ListPage onSelect={handleListSelect} />}
+                {activeTab === 'settings' && <SettingsPage clearHistory={clearHistory} onOpenPrivacy={handleOpenPrivacy} />}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
       </main>
 
       {/* Privacy and Agreement Modals */}

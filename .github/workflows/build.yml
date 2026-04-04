@@ -48,6 +48,7 @@ jobs:
       - name: Build Android APK
         run: |
           cd android
+          gradle clean
           gradle assembleDebug --stacktrace --warning-mode all
 
       - name: Upload Debug APK

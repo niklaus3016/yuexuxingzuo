@@ -48,8 +48,7 @@ jobs:
       - name: Build Android APK
         run: |
           cd android
-          gradle clean
-          gradle assembleDebug --stacktrace --warning-mode all --info
+          gradle clean assembleDebug --stacktrace --warning-mode all --info --no-build-cache
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4

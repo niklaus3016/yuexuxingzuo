@@ -68,9 +68,15 @@ jobs:
         cd android
         echo "Run # 将 base64 编码的 keystore 还原为文件"
         echo ""
+        # Get full keytool output for debugging
+        full_output=$(keytool -list -v -keystore app/my-release-key.keystore -alias yuexuxingzuo -storepass "${{ secrets.KEYSTORE_PASSWORD }}")
+        
         echo "===== MD5 指纹（证书MD5）====="
-        # Extract MD5 fingerprint with colons
-        md5_with_colons=$(keytool -list -v -keystore app/my-release-key.keystore -alias yuexuxingzuo -storepass "${{ secrets.KEYSTORE_PASSWORD }}" | grep -i md5 | head -1 | sed 's/.*MD5:\s*//' | sed 's/\s*$//')
+        # Extract MD5 fingerprint with colons using more reliable method
+        md5_with_colons=$(echo "$full_output" | grep -i "md5:" | head -1 | sed 's/.*md5:\s*//i' | sed 's/\s*$//')
+        if [ -z "$md5_with_colons" ]; then
+          md5_with_colons=$(echo "$full_output" | grep -i "md5" | head -1 | sed 's/.*://' | sed 's/\s*$//')
+        fi
         echo "$md5_with_colons"
         echo "======================================="
         echo ""
@@ -82,7 +88,7 @@ jobs:
         echo ""
         echo "===== SHA1 指纹（小米应用商店用）====="
         # Extract SHA1 fingerprint with colons
-        sha1_with_colons=$(keytool -list -v -keystore app/my-release-key.keystore -alias yuexuxingzuo -storepass "${{ secrets.KEYSTORE_PASSWORD }}" | grep -i sha1 | head -1 | sed 's/.*SHA1:\s*//' | sed 's/\s*$//')
+        sha1_with_colons=$(echo "$full_output" | grep -i "sha1:" | head -1 | sed 's/.*sha1:\s*//i' | sed 's/\s*$//')
         echo "$sha1_with_colons"
         echo "======================================="
         echo ""
@@ -94,7 +100,10 @@ jobs:
         echo ""
         echo "===== 公钥信息 ===="
         # Show public key information
-        keytool -list -v -keystore app/my-release-key.keystore -alias yuexuxingzuo -storepass "${{ secrets.KEYSTORE_PASSWORD }}" | grep -A 5 "Subject Public Key Algorithm"
+        echo "$full_output" | grep -A 10 "Subject Public Key Algorithm"
+        echo ""
+        echo "=== Debug: Full keytool output ==="
+        echo "$full_output"
 
     - name: Build Android Release APK
       run: |

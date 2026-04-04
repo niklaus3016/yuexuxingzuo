@@ -55,9 +55,9 @@ android {
     signingConfigs {
         release {
             storeFile file('../my-release-key.keystore')
-            storePassword '123456'
-            keyAlias 'yuexuxingzuo'
-            keyPassword '123456'
+            storePassword System.getProperty('android.injected.signing.store.password', '123456')
+            keyAlias System.getProperty('android.injected.signing.key.alias', 'yuexuxingzuo')
+            keyPassword System.getProperty('android.injected.signing.key.password', '123456')
             v1SigningEnabled true
             v2SigningEnabled false
             storeType 'JKS'

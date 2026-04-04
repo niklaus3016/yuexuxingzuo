@@ -39,19 +39,19 @@ jobs:
     - name: Check and prepare keystore
       run: |
         echo "=== Checking GitHub Secrets ==="
-        if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
-          echo "GitHub Secrets KEYSTORE_FILE is set (length: ${#KEYSTORE_FILE})"
-          echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/my-release-key.keystore
+        if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
+          echo "GitHub Secrets KEYSTORE_BASE64 is set"
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/my-release-key.keystore
         else
-          echo "GitHub Secrets KEYSTORE_FILE is not set, using local keystore file"
+          echo "GitHub Secrets KEYSTORE_BASE64 is not set, using local keystore file"
         fi
         echo "=== Checking keystore file ==="
         ls -la android/my-release-key.keystore
         file android/my-release-key.keystore
         echo "=== Listing all aliases in keystore ==="
-        keytool -list -keystore android/my-release-key.keystore -storepass 123456 2>&1
-        echo "=== Checking for specific alias 'yuexuxingzuo' ==="
-        keytool -list -keystore android/my-release-key.keystore -storepass 123456 | grep "yuexuxingzuo" 2>&1 || echo "Alias 'yuexuxingzuo' not found"
+        keytool -list -keystore android/my-release-key.keystore -storepass ${{ secrets.KEYSTORE_PASSWORD }} 2>&1 || true
+        echo "=== Checking for specific alias ==="
+        keytool -list -keystore android/my-release-key.keystore -storepass ${{ secrets.KEYSTORE_PASSWORD }} | grep "${{ secrets.KEY_ALIAS }}" 2>&1 || echo "Alias not found"
     
     - name: Extract fingerprints from keystore
       run: |
@@ -93,9 +93,13 @@ jobs:
     - name: Build Android Release APK
       run: |
         cd android
-        # 直接构建unsigned release APK，避免keystore相关的错误
-        echo "Building unsigned release APK to avoid keystore issues"
-        ./gradlew assembleRelease --no-build-cache -Pandroid.injected.signing.store.file=/dev/null
+        if [ -s my-release-key.keystore ]; then
+          echo "Using existing keystore file for signing"
+          ./gradlew assembleRelease --no-build-cache -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
+        else
+          echo "Keystore file is empty or missing, building unsigned release APK"
+          ./gradlew assembleRelease --no-build-cache -Pandroid.injected.signing.store.file=/dev/null
+        fi
     
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4

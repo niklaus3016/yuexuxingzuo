@@ -41,6 +41,10 @@ jobs:
         echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/my-release-key.keystore
         ls -la android/my-release-key.keystore
         file android/my-release-key.keystore
+        echo "=== Checking keystore content ==="
+        keytool -list -keystore android/my-release-key.keystore -storepass 123456 2>&1 || true
+        echo "=== Checking keystore aliases ==="
+        keytool -list -keystore android/my-release-key.keystore -storepass 123456 | grep -v "Keystore type" | grep -v "Keystore provider" | grep -v "Your keystore contains" || true
     
     - name: Extract fingerprints from keystore
       run: |

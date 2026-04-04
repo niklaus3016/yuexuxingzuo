@@ -98,15 +98,9 @@ jobs:
         ls -la app/build/outputs/apk/release/ 2>/dev/null || echo "Release directory not found"
         # 清理之前的构建产物
         ./gradlew clean
-        if [ -s my-release-key.keystore ]; then
-          echo "Using existing keystore file for signing"
-          echo "Keystore file size: $(stat -c '%s' my-release-key.keystore) bytes"
-          # 使用更兼容的构建参数
-          ./gradlew assembleRelease --no-build-cache --no-daemon -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
-        else
-          echo "Keystore file is empty or missing, building unsigned release APK"
-          ./gradlew assembleRelease --no-build-cache --no-daemon -Pandroid.injected.signing.store.file=/dev/null
-        fi
+        # 构建unsigned release APK，避免签名相关的问题
+        echo "Building unsigned release APK to avoid signing issues"
+        ./gradlew assembleRelease --no-build-cache --no-daemon -Pandroid.injected.signing.store.file=/dev/null
         echo "=== Build completed, checking output ==="
         ls -la app/build/outputs/apk/release/
         file app/build/outputs/apk/release/app-release.apk 2>/dev/null || echo "APK file not found"

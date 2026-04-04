@@ -44,25 +44,29 @@ jobs:
       run: |
         echo "# 将 base64 编码的 keystore 还原为文件"
         echo ""
-        echo "===== 证书指纹 ====="
-        keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep -E "(MD5|SHA1|SHA256):"
-        echo "===================="
-        echo ""
-        echo "===== MD5 指纹 ====="
-        keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep "MD5:" | sed 's/.*MD5: //'
-        echo "===================="
-        echo ""
-        echo "===== SHA1 指纹（小米应用商店用）====="
-        keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep "SHA1:" | sed 's/.*SHA1: //'
-        echo "======================================"
-        echo ""
-        echo "===== 去掉冒号的 SHA1（直接复制）====="
-        keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep "SHA1:" | sed 's/.*SHA1: //' | tr -d ':'
-        echo "======================================"
-        echo ""
-        echo "===== 公钥信息 ====="
-        keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep -A 3 "Certificate fingerprints:"
-        echo "============================="
+        if [ -f "android/my-release-key.keystore" ]; then
+          echo "===== 证书指纹 ====="
+          keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 2>/dev/null | grep -E "(MD5|SHA1|SHA256):"
+          echo "===================="
+          echo ""
+          echo "===== MD5 指纹 ====="
+          keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 2>/dev/null | grep "MD5:" | sed 's/.*MD5: //'
+          echo "===================="
+          echo ""
+          echo "===== SHA1 指纹（小米应用商店用）====="
+          keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 2>/dev/null | grep "SHA1:" | sed 's/.*SHA1: //'
+          echo "======================================"
+          echo ""
+          echo "===== 去掉冒号的 SHA1（直接复制）====="
+          keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 2>/dev/null | grep "SHA1:" | sed 's/.*SHA1: //' | tr -d ':'
+          echo "======================================"
+          echo ""
+          echo "===== 公钥信息 ====="
+          keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 2>/dev/null | grep -A 3 "Certificate fingerprints:"
+          echo "============================="
+        else
+          echo "警告：keystore 文件不存在，跳过指纹提取"
+        fi
     
     - name: Make gradlew executable
       run: chmod +x ./android/gradlew

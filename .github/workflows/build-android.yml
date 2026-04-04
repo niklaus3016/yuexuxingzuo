@@ -38,18 +38,20 @@ jobs:
     
     - name: Check and prepare keystore
       run: |
+        echo "=== Checking GitHub Secrets ==="
         if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
-          echo "Using keystore from GitHub Secrets"
+          echo "GitHub Secrets KEYSTORE_FILE is set (length: ${#KEYSTORE_FILE})"
           echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/my-release-key.keystore
         else
-          echo "Using local keystore file"
+          echo "GitHub Secrets KEYSTORE_FILE is not set, using local keystore file"
         fi
+        echo "=== Checking keystore file ==="
         ls -la android/my-release-key.keystore
         file android/my-release-key.keystore
-        echo "=== Checking keystore content ==="
-        keytool -list -keystore android/my-release-key.keystore -storepass 123456 2>&1 || true
-        echo "=== Checking keystore aliases ==="
-        keytool -list -keystore android/my-release-key.keystore -storepass 123456 | grep -v "Keystore type" | grep -v "Keystore provider" | grep -v "Your keystore contains" || true
+        echo "=== Listing all aliases in keystore ==="
+        keytool -list -keystore android/my-release-key.keystore -storepass 123456 2>&1
+        echo "=== Checking for specific alias 'yuexuxingzuo' ==="
+        keytool -list -keystore android/my-release-key.keystore -storepass 123456 | grep "yuexuxingzuo" 2>&1 || echo "Alias 'yuexuxingzuo' not found"
     
     - name: Extract fingerprints from keystore
       run: |

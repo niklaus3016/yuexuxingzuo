@@ -55,11 +55,11 @@ android {
     signingConfigs {
         release {
             storeFile file('../my-release-key.keystore')
-            storePassword System.getProperty('android.injected.signing.store.password', '123456')
-            keyAlias System.getProperty('android.injected.signing.key.alias', 'yuexuxingzuo')
-            keyPassword System.getProperty('android.injected.signing.key.password', '123456')
+            storePassword '123456'
+            keyAlias 'yuexuxingzuo'
+            keyPassword '123456'
             v1SigningEnabled true
-            v2SigningEnabled false
+            v2SigningEnabled true
             storeType 'JKS'
         }
     }
@@ -68,7 +68,7 @@ android {
         release { 
             minifyEnabled false 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro' 
-            // 不使用签名配置，直接构建unsigned APK
+            signingConfig signingConfigs.release
         } 
     } 
 }

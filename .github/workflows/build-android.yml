@@ -39,15 +39,28 @@ jobs:
     - name: Make gradlew executable
       run: chmod +x ./android/gradlew
 
+    - name: Create keystore file
+      run: |
+        cd android
+        # Create keystore file if it doesn't exist
+        if [ ! -f "my-release-key.keystore" ]; then
+          echo "Creating keystore file"
+          keytool -genkey -v -keystore my-release-key.keystore -alias yuexuxingzuo -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=yuexuxingzuo, OU=yuexuxingzuo, O=yuexuxingzuo, L=Beijing, ST=Beijing, C=CN"
+        else
+          echo "Keystore file already exists"
+        fi
+        # List aliases in keystore
+        keytool -list -keystore my-release-key.keystore -storepass 123456
+
     - name: Build Android Release APK
       run: |
         cd android
         echo "=== Building Release APK ==="
         # 清理之前的构建产物
         ./gradlew clean
-        # 构建unsigned release APK，避免签名相关的问题
-        echo "Building unsigned release APK to avoid signing issues"
-        ./gradlew assembleRelease --no-build-cache --no-daemon -Pandroid.injected.signing.store.file=/dev/null
+        # 构建release APK
+        echo "Building release APK"
+        ./gradlew assembleRelease --no-build-cache --no-daemon
         echo "=== Build completed, checking output ==="
         ls -la app/build/outputs/apk/release/
         file app/build/outputs/apk/release/app-release.apk 2>/dev/null || echo "APK file not found"
@@ -55,6 +68,20 @@ jobs:
         # 验证APK文件的完整性
         echo "=== Verifying APK file ==="
         unzip -t app/build/outputs/apk/release/app-release.apk 2>/dev/null || echo "APK file verification failed"
+        # 检查APK签名
+        echo "=== Checking APK signature ==="
+        if command -v apksigner &> /dev/null; then
+          apksigner verify --verbose app/build/outputs/apk/release/app-release.apk 2>/dev/null || echo "Cannot verify APK signature"
+        else
+          echo "apksigner not found, skipping signature verification"
+        fi
+        # 查看APK基本信息
+        echo "=== Checking APK basic info ==="
+        if command -v aapt &> /dev/null; then
+          aapt dump badging app/build/outputs/apk/release/app-release.apk | grep -E "package|sdkVersion" 2>/dev/null || echo "Cannot get APK info"
+        else
+          echo "aapt not found, skipping APK info check"
+        fi
 
     - name: Build Android Debug APK
       run: |

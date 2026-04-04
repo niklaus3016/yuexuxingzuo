@@ -93,7 +93,15 @@ jobs:
         cd android
         if [ -s my-release-key.keystore ]; then
           echo "Using existing keystore file for signing"
-          ./gradlew assembleRelease --no-build-cache
+          # Check if the alias exists in the keystore
+          ALIAS_EXISTS=$(keytool -list -keystore my-release-key.keystore -storepass 123456 | grep -c "yuexuxingzuo")
+          if [ $ALIAS_EXISTS -gt 0 ]; then
+            echo "Alias 'yuexuxingzuo' found in keystore, building signed release APK"
+            ./gradlew assembleRelease --no-build-cache
+          else
+            echo "Alias 'yuexuxingzuo' not found in keystore, building unsigned release APK"
+            ./gradlew assembleRelease --no-build-cache -Pandroid.injected.signing.store.file=/dev/null
+          fi
         else
           echo "Keystore file is empty or missing, building unsigned release APK"
           ./gradlew assembleRelease --no-build-cache -Pandroid.injected.signing.store.file=/dev/null

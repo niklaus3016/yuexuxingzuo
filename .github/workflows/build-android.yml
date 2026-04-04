@@ -65,7 +65,7 @@ jobs:
         echo ""
         echo "===== SHA1 指纹（小米应用商店用）====="
         # Extract SHA1 fingerprint with colons
-        sha1_with_colons=$(keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep -A 1 "SHA1:" | tail -1 | sed 's/^[[:space:]]*//')
+        sha1_with_colons=$(keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep -E "^SHA1:" | sed 's/SHA1:\s*//')
         echo "$sha1_with_colons"
         echo "======================================="
         echo ""

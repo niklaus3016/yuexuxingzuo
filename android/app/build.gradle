@@ -68,8 +68,10 @@ android {
         release { 
             minifyEnabled false 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro' 
-            // 添加签名配置引用
-            signingConfig signingConfigs.release
+            // 只有当keystore文件存在时才使用签名配置
+            if (file('../my-release-key.keystore').exists()) {
+                signingConfig signingConfigs.release
+            }
         } 
     } 
 }

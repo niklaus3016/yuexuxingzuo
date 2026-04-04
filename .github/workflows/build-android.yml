@@ -63,8 +63,20 @@ jobs:
         cd android
         echo "Run # 将 base64 编码的 keystore 还原为文件"
         echo ""
+        echo "===== MD5 指纹（证书MD5）====="
+        # Extract MD5 fingerprint with colons
+        md5_with_colons=$(keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep -i md5 | head -1 | sed 's/.*MD5:\s*//' | sed 's/\s*$//')
+        echo "$md5_with_colons"
+        echo "======================================="
+        echo ""
+        echo "===== 去掉冒号的 MD5（直接复制）====="
+        # Remove colons from MD5
+        md5_without_colons=$(echo "$md5_with_colons" | tr -d ":")
+        echo "$md5_without_colons"
+        echo "======================================="
+        echo ""
         echo "===== SHA1 指纹（小米应用商店用）====="
-        # Extract SHA1 fingerprint with colons using more reliable method
+        # Extract SHA1 fingerprint with colons
         sha1_with_colons=$(keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep -i sha1 | head -1 | sed 's/.*SHA1:\s*//' | sed 's/\s*$//')
         echo "$sha1_with_colons"
         echo "======================================="
@@ -74,9 +86,10 @@ jobs:
         sha1_without_colons=$(echo "$sha1_with_colons" | tr -d ":")
         echo "$sha1_without_colons"
         echo "======================================="
-        # Debug: show full keytool output
-        echo "\n=== Debug: Full keytool output ==="
-        keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | head -30
+        echo ""
+        echo "===== 公钥信息 ===="
+        # Show public key information
+        keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep -A 5 "Subject Public Key Algorithm"
 
     - name: Build Android Release APK
       run: |

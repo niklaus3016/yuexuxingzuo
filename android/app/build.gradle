@@ -59,7 +59,8 @@ android {
             keyAlias 'yuexuxingzuo'
             keyPassword '123456'
             v1SigningEnabled true
-            v2SigningEnabled true
+            v2SigningEnabled false
+            storeType 'JKS'
         }
     }
     

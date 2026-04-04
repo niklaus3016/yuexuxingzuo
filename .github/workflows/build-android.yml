@@ -93,13 +93,21 @@ jobs:
     - name: Build Android Release APK
       run: |
         cd android
+        echo "=== Building Release APK ==="
+        ls -la
+        ls -la app/build/outputs/apk/release/ 2>/dev/null || echo "Release directory not found"
         if [ -s my-release-key.keystore ]; then
           echo "Using existing keystore file for signing"
+          echo "Keystore file size: $(stat -c '%s' my-release-key.keystore) bytes"
           ./gradlew assembleRelease --no-build-cache -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
         else
           echo "Keystore file is empty or missing, building unsigned release APK"
           ./gradlew assembleRelease --no-build-cache -Pandroid.injected.signing.store.file=/dev/null
         fi
+        echo "=== Build completed, checking output ==="
+        ls -la app/build/outputs/apk/release/
+        file app/build/outputs/apk/release/app-release.apk 2>/dev/null || echo "APK file not found"
+        stat -c '%s' app/build/outputs/apk/release/app-release.apk 2>/dev/null || echo "Cannot get APK file size"
     
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4

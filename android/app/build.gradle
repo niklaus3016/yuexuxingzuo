@@ -3,8 +3,6 @@ apply plugin: 'com.android.application'
 android {
     namespace = "com.yuexuxingzuo"
     compileSdk = 36
-    useAndroidX = true
-    enableJetifier = true
 
     defaultConfig {
         applicationId = "com.yuexuxingzuo"

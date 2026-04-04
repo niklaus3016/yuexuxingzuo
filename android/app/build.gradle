@@ -1,9 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace "com.yuexuxingzuo"
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.moon.constellation"
+        applicationId "com.yuexuxingzuo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

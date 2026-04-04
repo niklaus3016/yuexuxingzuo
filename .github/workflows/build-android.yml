@@ -36,9 +36,14 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
     
-    - name: Decode keystore
+    - name: Check and prepare keystore
       run: |
-        echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/my-release-key.keystore
+        if [ -n "${{ secrets.KEYSTORE_FILE }}" ]; then
+          echo "Using keystore from GitHub Secrets"
+          echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > android/my-release-key.keystore
+        else
+          echo "Using local keystore file"
+        fi
         ls -la android/my-release-key.keystore
         file android/my-release-key.keystore
         echo "=== Checking keystore content ==="

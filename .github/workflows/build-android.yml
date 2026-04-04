@@ -42,15 +42,21 @@ jobs:
     - name: Create keystore file
       run: |
         cd android
-        # Create keystore file if it doesn't exist
-        if [ ! -f "my-release-key.keystore" ]; then
-          echo "Creating keystore file"
-          keytool -genkey -v -keystore my-release-key.keystore -alias yuexuxingzuo -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=yuexuxingzuo, OU=yuexuxingzuo, O=yuexuxingzuo, L=Beijing, ST=Beijing, C=CN"
-        else
-          echo "Keystore file already exists"
+        # Remove existing keystore file to ensure a fresh creation
+        if [ -f "my-release-key.keystore" ]; then
+          echo "Removing existing keystore file"
+          rm -f my-release-key.keystore
         fi
+        # Create new keystore file
+        echo "Creating keystore file"
+        keytool -genkey -v -keystore my-release-key.keystore -alias yuexuxingzuo -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=yuexuxingzuo, OU=yuexuxingzuo, O=yuexuxingzuo, L=Beijing, ST=Beijing, C=CN"
         # List aliases in keystore
+        echo "=== Listing aliases in keystore ==="
         keytool -list -keystore my-release-key.keystore -storepass 123456
+        # Check keystore file details
+        echo "=== Keystore file details ==="
+        ls -la my-release-key.keystore
+        file my-release-key.keystore
 
     - name: Build Android Release APK
       run: |

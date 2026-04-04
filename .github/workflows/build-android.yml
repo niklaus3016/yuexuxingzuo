@@ -36,66 +36,13 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
     
-    - name: Check and prepare keystore
-      run: |
-        echo "=== Checking GitHub Secrets ==="
-        if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
-          echo "GitHub Secrets KEYSTORE_BASE64 is set"
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/my-release-key.keystore
-        else
-          echo "GitHub Secrets KEYSTORE_BASE64 is not set, using local keystore file"
-        fi
-        echo "=== Checking keystore file ==="
-        ls -la android/my-release-key.keystore
-        file android/my-release-key.keystore
-        echo "=== Listing all aliases in keystore ==="
-        keytool -list -keystore android/my-release-key.keystore -storepass ${{ secrets.KEYSTORE_PASSWORD }} 2>&1 || true
-        echo "=== Checking for specific alias ==="
-        keytool -list -keystore android/my-release-key.keystore -storepass ${{ secrets.KEYSTORE_PASSWORD }} | grep "${{ secrets.KEY_ALIAS }}" 2>&1 || echo "Alias not found"
-    
-    - name: Extract fingerprints from keystore
-      run: |
-        echo "# 将 base64 编码的 keystore 还原为文件"
-        echo ""
-        if [ -f "android/my-release-key.keystore" ]; then
-          echo "===== 证书指纹 ====="
-          keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 2>/dev/null | grep -E "(MD5|SHA1|SHA256):" || true
-          echo "===================="
-          echo ""
-          echo "===== MD5 指纹 ====="
-          keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 2>/dev/null | grep "MD5:" | sed 's/.*MD5: //' || true
-          echo "===================="
-          echo ""
-          echo "===== SHA1 指纹（小米应用商店用）====="
-          keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 2>/dev/null | grep "SHA1:" | sed 's/.*SHA1: //' || true
-          echo "======================================"
-          echo ""
-          echo "===== 去掉冒号的 SHA1（直接复制）====="
-          keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 2>/dev/null | grep "SHA1:" | sed 's/.*SHA1: //' | tr -d ':' || true
-          echo "======================================"
-          echo ""
-          echo "===== 公钥信息 ====="
-          keytool -list -v -keystore android/my-release-key.keystore -alias yuexuxingzuo -storepass 123456 2>/dev/null | grep -A 3 "Certificate fingerprints:" || true
-          echo "============================="
-        else
-          echo "警告：keystore 文件不存在，跳过指纹提取"
-        fi
-        echo "指纹提取步骤完成（即使出现错误也会继续构建）"
-    
     - name: Make gradlew executable
       run: chmod +x ./android/gradlew
-    
-    - name: Build Android Debug APK
-      run: |
-        cd android
-        ./gradlew assembleDebug
-    
+
     - name: Build Android Release APK
       run: |
         cd android
         echo "=== Building Release APK ==="
-        ls -la
-        ls -la app/build/outputs/apk/release/ 2>/dev/null || echo "Release directory not found"
         # 清理之前的构建产物
         ./gradlew clean
         # 构建unsigned release APK，避免签名相关的问题
@@ -108,6 +55,11 @@ jobs:
         # 验证APK文件的完整性
         echo "=== Verifying APK file ==="
         unzip -t app/build/outputs/apk/release/app-release.apk 2>/dev/null || echo "APK file verification failed"
+
+    - name: Build Android Debug APK
+      run: |
+        cd android
+        ./gradlew assembleDebug
     
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4

@@ -93,21 +93,9 @@ jobs:
     - name: Build Android Release APK
       run: |
         cd android
-        if [ -s my-release-key.keystore ]; then
-          echo "Using existing keystore file for signing"
-          # Check if the alias exists in the keystore with error handling
-          ALIAS_EXISTS=$(keytool -list -keystore my-release-key.keystore -storepass 123456 2>/dev/null | grep -c "yuexuxingzuo")
-          if [ $? -eq 0 ] && [ $ALIAS_EXISTS -gt 0 ]; then
-            echo "Alias 'yuexuxingzuo' found in keystore, building signed release APK"
-            ./gradlew assembleRelease --no-build-cache
-          else
-            echo "Alias 'yuexuxingzuo' not found in keystore or keytool failed, building unsigned release APK"
-            ./gradlew assembleRelease --no-build-cache -Pandroid.injected.signing.store.file=/dev/null
-          fi
-        else
-          echo "Keystore file is empty or missing, building unsigned release APK"
-          ./gradlew assembleRelease --no-build-cache -Pandroid.injected.signing.store.file=/dev/null
-        fi
+        # 直接构建unsigned release APK，避免keystore相关的错误
+        echo "Building unsigned release APK to avoid keystore issues"
+        ./gradlew assembleRelease --no-build-cache -Pandroid.injected.signing.store.file=/dev/null
     
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4

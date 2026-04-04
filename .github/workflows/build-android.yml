@@ -77,11 +77,10 @@ jobs:
         cd android
         ./gradlew assembleDebug
     
-    # 暂时注释掉release构建，因为签名文件有问题
-    # - name: Build Android Release APK
-    #   run: |
-    #     cd android
-    #     ./gradlew assembleRelease
+    - name: Build Android Release APK
+      run: |
+        cd android
+        ./gradlew assembleRelease --no-build-cache
     
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
@@ -90,10 +89,9 @@ jobs:
         path: android/app/build/outputs/apk/debug/app-debug.apk
         retention-days: 30
     
-    # 暂时注释掉release APK上传，因为签名文件有问题
-    # - name: Upload Release APK
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: app-release
-    #     path: android/app/build/outputs/apk/release/app-release.apk
-    #     retention-days: 30
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release
+        path: android/app/build/outputs/apk/release/app-release.apk
+        retention-days: 30

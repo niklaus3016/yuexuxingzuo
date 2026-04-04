@@ -4,9 +4,7 @@ const config: CapacitorConfig = {
   appId: 'com.yuexuxingzuo.app',
   appName: '月序星座',
   webDir: 'dist',
-  android: {
-    icon: 'yxxzicon.png'
-  }
+  android: {}
 };
 
 export default config;

@@ -67,13 +67,10 @@ jobs:
     #     keytool -list -v -keystore android/my-release-key.keystore -alias qingxujifen -storepass 123456 | grep -A 3 "Certificate fingerprints:"
     #     echo "============================="
     
-    - name: Make gradlew executable
-      run: chmod +x ./android/gradlew
-    
     - name: Build Android APK
       run: |
         cd android
-        ./gradlew assembleDebug
+        gradle assembleDebug
     
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4

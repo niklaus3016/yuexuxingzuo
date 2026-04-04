@@ -39,20 +39,25 @@ jobs:
     - name: Make gradlew executable
       run: chmod +x ./android/gradlew
 
-    - name: Create keystore file
+    - name: Create keystore file from GitHub Secrets
       run: |
         cd android
-        # Remove existing keystore file to ensure a fresh creation
+        # Check if KEYSTORE_BASE64 secret is set
+        if [ -z "${{ secrets.KEYSTORE_BASE64 }}" ]; then
+          echo "Error: KEYSTORE_BASE64 secret is not set"
+          exit 1
+        fi
+        # Remove existing keystore file if it exists
         if [ -f "my-release-key.keystore" ]; then
           echo "Removing existing keystore file"
           rm -f my-release-key.keystore
         fi
-        # Create new keystore file
-        echo "Creating keystore file"
-        keytool -genkey -v -keystore my-release-key.keystore -alias yuexuxingzuo -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=yuexuxingzuo, OU=yuexuxingzuo, O=yuexuxingzuo, L=Beijing, ST=Beijing, C=CN"
+        # Create keystore file from base64 encoded secret
+        echo "Creating keystore file from GitHub Secrets"
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > my-release-key.keystore
         # List aliases in keystore
         echo "=== Listing aliases in keystore ==="
-        keytool -list -keystore my-release-key.keystore -storepass 123456
+        keytool -list -keystore my-release-key.keystore -storepass "${{ secrets.KEYSTORE_PASSWORD }}"
         # Check keystore file details
         echo "=== Keystore file details ==="
         ls -la my-release-key.keystore
@@ -65,7 +70,7 @@ jobs:
         echo ""
         echo "===== MD5 指纹（证书MD5）====="
         # Extract MD5 fingerprint with colons
-        md5_with_colons=$(keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep -i md5 | head -1 | sed 's/.*MD5:\s*//' | sed 's/\s*$//')
+        md5_with_colons=$(keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass "${{ secrets.KEYSTORE_PASSWORD }}" | grep -i md5 | head -1 | sed 's/.*MD5:\s*//' | sed 's/\s*$//')
         echo "$md5_with_colons"
         echo "======================================="
         echo ""
@@ -77,7 +82,7 @@ jobs:
         echo ""
         echo "===== SHA1 指纹（小米应用商店用）====="
         # Extract SHA1 fingerprint with colons
-        sha1_with_colons=$(keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep -i sha1 | head -1 | sed 's/.*SHA1:\s*//' | sed 's/\s*$//')
+        sha1_with_colons=$(keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass "${{ secrets.KEYSTORE_PASSWORD }}" | grep -i sha1 | head -1 | sed 's/.*SHA1:\s*//' | sed 's/\s*$//')
         echo "$sha1_with_colons"
         echo "======================================="
         echo ""
@@ -89,7 +94,7 @@ jobs:
         echo ""
         echo "===== 公钥信息 ===="
         # Show public key information
-        keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass 123456 | grep -A 5 "Subject Public Key Algorithm"
+        keytool -list -v -keystore my-release-key.keystore -alias yuexuxingzuo -storepass "${{ secrets.KEYSTORE_PASSWORD }}" | grep -A 5 "Subject Public Key Algorithm"
 
     - name: Build Android Release APK
       run: |
@@ -99,7 +104,7 @@ jobs:
         ./gradlew clean
         # 构建release APK
         echo "Building release APK"
-        ./gradlew assembleRelease --no-build-cache --no-daemon
+        ./gradlew assembleRelease --no-build-cache --no-daemon -Pandroid.injected.signing.store.file=my-release-key.keystore -Pandroid.injected.signing.store.password="${{ secrets.KEYSTORE_PASSWORD }}" -Pandroid.injected.signing.key.alias=yuexuxingzuo -Pandroid.injected.signing.key.password="${{ secrets.KEYSTORE_PASSWORD }}"
         echo "=== Build completed, checking output ==="
         ls -la app/build/outputs/apk/release/
         file app/build/outputs/apk/release/app-release.apk 2>/dev/null || echo "APK file not found"

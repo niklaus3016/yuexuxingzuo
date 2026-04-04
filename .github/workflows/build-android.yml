@@ -70,7 +70,7 @@ jobs:
     - name: Build Android APK
       run: |
         cd android
-        ./gradlew assembleDebug --no-build-cache -x checkDebugAarMetadata -x processDebugNavigationResources -x mapDebugSourceSetPaths -Dandroid.useAndroidX=true -Dandroid.enableJetifier=true
+        ./gradlew assembleDebug
     
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4

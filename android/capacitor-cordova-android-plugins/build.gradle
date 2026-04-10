@@ -1,31 +1,21 @@
-ext {
-    androidxAppCompatVersion = project.hasProperty('androidxAppCompatVersion') ? rootProject.ext.androidxAppCompatVersion : '1.7.1'
-    cordovaAndroidVersion = project.hasProperty('cordovaAndroidVersion') ? rootProject.ext.cordovaAndroidVersion : '14.0.1'
-}
-
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.13.0'
-    }
-}
-
+// build.gradle for capacitor-cordova-android-plugins
 apply plugin: 'com.android.library'
 
 android {
-    namespace = "capacitor.cordova.android.plugins"
-    compileSdk = project.hasProperty('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 36
+    namespace 'com.qingxujifen.app.plugins'
+    compileSdkVersion 34
     defaultConfig {
-        minSdkVersion project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 24
-        targetSdkVersion project.hasProperty('targetSdkVersion') ? rootProject.ext.targetSdkVersion : 36
+        minSdkVersion 22
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    lintOptions {
-        abortOnError = false
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_21
@@ -33,27 +23,10 @@ android {
     }
 }
 
-repositories {
-    google()
-    mavenCentral()
-    flatDir{
-        dirs 'src/main/libs', 'libs'
-    }
-}
-
 dependencies {
-    implementation fileTree(dir: 'src/main/libs', include: ['*.jar'])
-    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
-    implementation "org.apache.cordova:framework:$cordovaAndroidVersion"
-    // SUB-PROJECT DEPENDENCIES START
-
-    // SUB-PROJECT DEPENDENCIES END
-}
-
-// PLUGIN GRADLE EXTENSIONS START
-apply from: "cordova.variables.gradle"
-// PLUGIN GRADLE EXTENSIONS END
-
-for (def func : cdvPluginPostBuildExtras) {
-    func()
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
